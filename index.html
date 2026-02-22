@@ -2,34 +2,49 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>змейка</title>
+<title>Snake Mobile</title>
 <style>
   body {
+    margin: 0;
     background: white;
+    font-family: Arial;
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 0;
-    font-family: Arial;
+  }
+
+  h1 {
+    margin-top: 40px;
   }
 
   canvas {
-    border: 3px solid black;
+    border: 4px solid black;
+    display: none;
     margin-top: 20px;
+  }
+
+  button {
+    font-size: 28px;
+    padding: 15px 30px;
+    border: 3px solid black;
+    background: white;
+  }
+
+  .menu, .gameover {
+    margin-top: 100px;
+    text-align: center;
   }
 
   .controls {
     margin-top: 20px;
-    display: grid;
-    grid-template-columns: 80px 80px 80px;
-    grid-template-rows: 80px 80px;
-    gap: 10px;
+    display: none;
+    grid-template-columns: 120px 120px 120px;
+    grid-template-rows: 120px 120px;
+    gap: 15px;
   }
 
-  button {
-    font-size: 24px;
-    border: 2px solid black;
-    background: white;
+  .controls button {
+    font-size: 40px;
   }
 
   .up { grid-column: 2; }
@@ -40,6 +55,11 @@
 </head>
 <body>
 
+<div class="menu">
+  <h1>ЗМЕЙКА</h1>
+  <button onclick="startGame()">Начать игру</button>
+</div>
+
 <canvas id="game" width="400" height="400"></canvas>
 
 <div class="controls">
@@ -49,18 +69,42 @@
   <button class="right">→</button>
 </div>
 
+<div class="gameover" style="display:none;">
+  <h1>Игра окончена!</h1>
+  <button onclick="restartGame()">Играть снова</button>
+</div>
+
 <script>
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
+const menu = document.querySelector(".menu");
+const gameover = document.querySelector(".gameover");
+const controls = document.querySelector(".controls");
 
 const box = 20;
-let snake = [{x: 200, y: 200}];
-let direction = "RIGHT";
+let snake, direction, food, game;
 
-let food = {
-  x: Math.floor(Math.random() * 20) * box,
-  y: Math.floor(Math.random() * 20) * box
-};
+function init() {
+  snake = [{x: 200, y: 200}];
+  direction = "RIGHT";
+  food = {
+    x: Math.floor(Math.random() * 20) * box,
+    y: Math.floor(Math.random() * 20) * box
+  };
+}
+
+function startGame() {
+  menu.style.display = "none";
+  gameover.style.display = "none";
+  canvas.style.display = "block";
+  controls.style.display = "grid";
+  init();
+  game = setInterval(draw, 300);
+}
+
+function restartGame() {
+  startGame();
+}
 
 function setDirection(newDir) {
   if (newDir === "LEFT" && direction !== "RIGHT") direction = "LEFT";
@@ -83,7 +127,6 @@ function draw() {
     ctx.fillRect(snake[i].x, snake[i].y, box, box);
   }
 
-  ctx.fillStyle = "black";
   ctx.fillRect(food.x, food.y, box, box);
 
   let snakeX = snake[0].x;
@@ -111,14 +154,14 @@ function draw() {
     snake.some(segment => segment.x === snakeX && segment.y === snakeY)
   ) {
     clearInterval(game);
-    alert("проиграл хахаха");
+    canvas.style.display = "none";
+    controls.style.display = "none";
+    gameover.style.display = "block";
+    return;
   }
 
   snake.unshift(newHead);
 }
-
-// Медленная скорость
-let game = setInterval(draw, 300);
 </script>
 
 </body>
